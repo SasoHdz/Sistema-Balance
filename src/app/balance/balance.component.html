@@ -3,7 +3,11 @@
     <div class="col">
       <div class="input-group mb-3">
         <span class="input-group-text">Debe:</span>
-        <select class="form-control form-control-lg" id="tengo">
+        <select
+          class="form-control form-control-lg"
+          [(ngModel)]="debe"
+          id="debe"
+        >
           <option *ngFor="let item of tablesCuentas[0].cuentas">
             {{ item.nameCount }}
           </option>
@@ -19,7 +23,11 @@
     <div class="col">
       <div class="input-group mb-3">
         <span class="input-group-text">Haber:</span>
-        <select class="form-control form-control-lg" id="tengo">
+        <select
+          class="form-control form-control-lg"
+          [(ngModel)]="haber"
+          id="haber"
+        >
           <option *ngFor="let item of tablesCuentas[0].cuentas">
             {{ item.nameCount }}
           </option>
@@ -35,14 +43,34 @@
     <div class="col">
       <div class="input-group mb-3">
         <span class="input-group-text">Monto:</span>
-        <input
-          type="number"
-          class="form-control"
-        />
+        <input type="number" class="form-control" [(ngModel)]="monto" />
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="modificarCuenta(debe, haber, monto)"
+        >
+          Listo!!
+        </button>
       </div>
     </div>
   </div>
 </div>
+<div
+  *ngIf="
+    tablesCuentas[0].getTotal() ===
+    tablesCuentas[1].getTotal() + tablesCuentas[2].getTotal();
+    else badCount
+  "
+  class="alert alert-primary"
+  role="alert"
+>
+  La cuenta es correcta.
+</div>
+<ng-template #badCount>
+  <div class="alert alert-danger" role="alert">
+    La cuenta es incorrecta, quiza te falta hacer algun movimiento.
+  </div>
+</ng-template>
 <div class="container text-center">
   <div class="row">
     <div *ngFor="let item of tablesCuentas" class="col">
@@ -65,9 +93,14 @@
     </div>
   </div>
   <div class="row">
-    <div *ngFor="let item of tablesCuentas" class="col">Total {{ item.tipo }}:</div>
+    <div *ngFor="let item of tablesCuentas" class="col">
+      Total {{ item.tipo }}:
+    </div>
   </div>
   <div class="row">
-    <div *ngFor="let item of tablesCuentas" class="col">{{ totalCuenta(item.cuentas) }}</div>
+    <div *ngFor="let item of tablesCuentas" class="col">
+      {{ totalCuenta(item.cuentas) }}
+    </div>
   </div>
 </div>
+
