@@ -1,0 +1,73 @@
+<div class="container-move mt-2">
+  <div class="row">
+    <div class="col">
+      <div class="input-group mb-3">
+        <span class="input-group-text">Debe:</span>
+        <select class="form-control form-control-lg" id="tengo">
+          <option *ngFor="let item of tablesCuentas[0].cuentas">
+            {{ item.nameCount }}
+          </option>
+          <option *ngFor="let item of tablesCuentas[1].cuentas">
+            {{ item.nameCount }}
+          </option>
+          <option *ngFor="let item of tablesCuentas[2].cuentas">
+            {{ item.nameCount }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group mb-3">
+        <span class="input-group-text">Haber:</span>
+        <select class="form-control form-control-lg" id="tengo">
+          <option *ngFor="let item of tablesCuentas[0].cuentas">
+            {{ item.nameCount }}
+          </option>
+          <option *ngFor="let item of tablesCuentas[1].cuentas">
+            {{ item.nameCount }}
+          </option>
+          <option *ngFor="let item of tablesCuentas[2].cuentas">
+            {{ item.nameCount }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group mb-3">
+        <span class="input-group-text">Monto:</span>
+        <input
+          type="number"
+          class="form-control"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container text-center">
+  <div class="row">
+    <div *ngFor="let item of tablesCuentas" class="col">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Concepto</th>
+            <th scope="col">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cuenta of item.cuentas">
+            <th scope="row">{{ cuenta.code }}</th>
+            <td>{{ cuenta.nameCount }}</td>
+            <td>{{ cuenta.value }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row">
+    <div *ngFor="let item of tablesCuentas" class="col">Total {{ item.tipo }}:</div>
+  </div>
+  <div class="row">
+    <div *ngFor="let item of tablesCuentas" class="col">{{ totalCuenta(item.cuentas) }}</div>
+  </div>
+</div>
