@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { Cuenta } from 'src/models/cuenta';
 import { ItemCuenta } from 'src/models/ItemCuenta';
@@ -15,6 +15,40 @@ export class BalanceComponent {
   thaber: string = '';
   monto: number = 0;
   keyStorage = 'balance';
+  activo = 0;
+  pasivo = 0;
+  capital = 0;
+  sameCount = false;
+  message :string = '';
+  codigo:string = '';
+  nombre: string = '';
+  tipo: string = '';
+  montonew: number = 0;
+
+  tablesCuentasInfo: Cuenta[] = [
+    new Cuenta('Activo', [
+      new ItemCuenta('1100', 'Caja', 20000, 'C'),
+      new ItemCuenta('1200', 'Bancos', 240000, 'C'),
+      new ItemCuenta('1300', 'Clientes', 245000, 'C'),
+      new ItemCuenta('1400', 'Almacenes', 300000, 'C'),
+      new ItemCuenta('1500', 'Deudores Diversos', 10000, 'C'),
+      new ItemCuenta('1600', 'Edificios', 150000, 'F'),
+      new ItemCuenta('1700', 'Equipo Transporte', 60000, 'F'),
+    ]),
+    new Cuenta('Pasivo', [
+      new ItemCuenta('2100', 'Proveedores', 125000, 'C'),
+      new ItemCuenta('2200', 'Documentos por pagar', 70000, 'C'),
+      new ItemCuenta('2300', 'Acreedores Diversos', 10000, 'C'),
+      new ItemCuenta('2400', 'Impuestos por pagar', 20000, 'C'),
+      new ItemCuenta('2500', 'Acreedores hipotecarios', 60000, 'F'),
+    ]),
+    new Cuenta('Capital', [
+      new ItemCuenta('3100', 'Capital Social', 350000, 'C'),
+      new ItemCuenta('3200', 'Utilidades Retenidas', 390000, 'C'),
+    ]),
+  ];
+
+  tablesCuentas: Cuenta[] = [];
 
   /*   tableAct: Cuenta =
   {
@@ -121,44 +155,36 @@ export class BalanceComponent {
     ]
   } */
 
-  tablesCuentas: Cuenta[] = [
-    new Cuenta('Activo',[
-      new ItemCuenta('1100', 'Caja', 20000, 'C'),
-      new ItemCuenta('1200', 'Bancos', 240000, 'C'),
-      new ItemCuenta('1300', 'Clientes', 245000, 'C'),
-      new ItemCuenta('1400', 'Almacenes', 300000, 'C'),
-      new ItemCuenta('1500', 'Deudores Diversos', 10000, 'C'),
-      new ItemCuenta('1600', 'Edificios', 150000, 'F'),
-      new ItemCuenta('1700', 'Equipo Transporte', 60000, 'F'),
-    ],),
-   new Cuenta('Pasivo',
-   [
-     new ItemCuenta('2100','Proveedores' ,125000, 'C',),
-     new ItemCuenta('2200','Documentos por pagar' ,70000, 'C',),
-     new ItemCuenta('2300','Acreedores Diversos' ,10000, 'C',),
-     new ItemCuenta('2400','Impuestos por pagar' ,20000, 'C',),
-     new ItemCuenta('2500','Acreedores hipotecarios' ,60000, 'F',),
-   ],),
-   new Cuenta('Capital',
-   [
-     new ItemCuenta('3100','Capital Social' ,350000, 'C',),
-     new ItemCuenta('3200','Utilidades Retenidas' ,390000, 'C',),
-   ],)
-  ];
+  ngOnInit(): void {
+    //debugger
 
-  ngOnInit(){
-    /* const localStorageItem = localStorage.getItem(this.keyStorage);
-    if(!localStorageItem){
-      localStorage.setItem(this.keyStorage,JSON.stringify(this.tablesCuentas));
+    const localStorageItem = localStorage.getItem(this.keyStorage);
+    if (!localStorageItem) {
+      localStorage.setItem(
+        this.keyStorage,
+        JSON.stringify(this.tablesCuentasInfo)
+      );
+      this.tablesCuentas = this.tablesCuentasInfo;
+    } else {
+      //debugger
+      this.tablesCuentasInfo = JSON.parse(localStorageItem);
+      let listCuentas: ItemCuenta[] = [];
+      this.tablesCuentas = this.tablesCuentasInfo.map((c) => {
+        listCuentas = c.cuentas.map((lc) => {
+          return new ItemCuenta(lc.code, lc.nameCount, lc.value, lc.itemTipo);
+        });
+
+        return new Cuenta(c.tipo, listCuentas);
+      });
     }
-    else {
-      this.tablesCuentas = JSON.parse(localStorageItem);
-    } */
+
+    this.totalCuenta();
   }
 
-
-  totalCuenta(cuentas: ItemCuenta[]) {
-    return cuentas.reduce((sum, itemc) => sum + itemc.value, 0);
+  totalCuenta() {
+    this.activo = this.tablesCuentas[0].getTotal();
+    this.pasivo = this.tablesCuentas[1].getTotal();
+    this.capital = this.tablesCuentas[2].getTotal();
   }
 
   verificarMov(disminuye: string, monto: number) {
@@ -173,34 +199,72 @@ export class BalanceComponent {
   }
 
   movimiento(nombreC: string, monto: number, op: number) {
-    let indice = this.tablesCuentas[0].cuentas.findIndex((c) => c.nameCount === nombreC);
+
+    let indice = this.tablesCuentas[0].cuentas.findIndex(
+      (c) => c.nameCount === nombreC
+    );
     console.log(indice);
-    if(indice>=0){
+    if (indice >= 0) {
       //console.log(indice + "If 1");
       //debugger
       op === 1
-          ? (this.tablesCuentas[0].cuentas[indice].addValue(monto))
-          : (this.tablesCuentas[0].cuentas[indice].resValue(monto));
-      //debugger
-    }
-    else {
-      indice = this.tablesCuentas[1].cuentas.findIndex((c) => c.nameCount === nombreC);
-      if(indice>=0){
-        //console.log(indice + "If 2");
-        op === 1
-            ? (this.tablesCuentas[1].cuentas[indice].addValue(monto))
-            : (this.tablesCuentas[1].cuentas[indice].resValue(monto));
+      if(op===1){
+        this.tablesCuentas[0].cuentas[indice].addValue(monto)
       }
       else {
-        indice = this.tablesCuentas[2].cuentas.findIndex((c) => c.nameCount === nombreC);
+        try {
+         this.tablesCuentas[0].cuentas[indice].resValue(monto);
+        } catch (error) {
+          this.message="Error no puedes sacar mas de lo que tienes";
+          console.log(error);
+        }
+      }
+
+        console.log(this.tablesCuentas[0].cuentas[indice]);
+
+      //debugger
+    } else {
+      indice = this.tablesCuentas[1].cuentas.findIndex(
+        (c) => c.nameCount === nombreC
+      );
+      if (indice >= 0) {
+        //console.log(indice + "If 2");
+        op === 1
+      if(op===1){
+        this.tablesCuentas[1].cuentas[indice].addValue(monto)
+      }
+      else {
+        try {
+         this.tablesCuentas[1].cuentas[indice].resValue(monto);
+        } catch (error) {
+          this.message="Error no puedes sacar mas de lo que tienes";
+          console.log(error);
+        }
+      }
+
+          console.log(this.tablesCuentas[1].cuentas[indice]);
+      } else {
+        indice = this.tablesCuentas[2].cuentas.findIndex(
+          (c) => c.nameCount === nombreC
+        );
         //console.log(indice + "Else final");
         op === 1
-            ? (this.tablesCuentas[2].cuentas[indice].addValue(monto))
-            : (this.tablesCuentas[2].cuentas[indice].resValue(monto));
+      if(op===1){
+        this.tablesCuentas[2].cuentas[indice].addValue(monto)
+      }
+      else {
+        try {
+         this.tablesCuentas[2].cuentas[indice].resValue(monto);
+        } catch (error) {
+          this.message="Error no puedes sacar mas de lo que tienes";
+          console.log(error);
+        }
+      }
+          console.log(this.tablesCuentas[2].cuentas[indice]);
+
       }
     }
-
-
+    this.totalCuenta();
     //console.log(this.tablesCuentas);
   }
 
@@ -211,18 +275,35 @@ export class BalanceComponent {
   modificarCuenta(debe: string, haber: string, monto: number) {
     //Debe se sumara la cantidad de haber
     //Verifica que la cantidad haber, es valida
-    this.isActive(debe)
+    if(debe===haber){
+      this.sameCount=true;
+    }
+    else {
+      this.sameCount=false;
+      debugger
+      this.isActive(debe)
       ? this.movimiento(debe, monto, 1)
       : this.movimiento(debe, monto, 0);
 
-    this.isActive(haber)
-      ? this.movimiento(haber, monto, 0)
-      : this.movimiento(haber, monto, 1);
+      this.isActive(haber)
+        ? this.movimiento(haber, monto, 0)
+        : this.movimiento(haber, monto, 1);
 
-    localStorage.setItem(this.keyStorage, JSON.stringify(this.tablesCuentas));
+      localStorage.setItem(this.keyStorage, JSON.stringify(this.tablesCuentas));
+    }
+
   }
 
-  mostrar(){
+  mostrar() {
     console.log(this.tablesCuentas);
+  }
+
+  addCuenta(code:string, nombre:string, monto:number,tipo:string){
+    const c = new ItemCuenta(code,nombre,monto,'C');
+    this.tablesCuentas.map(e=>{
+      if(e.tipo === tipo) e.cuentas.push(c);
+    });
+
+    this.totalCuenta()
   }
 }

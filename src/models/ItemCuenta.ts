@@ -16,6 +16,9 @@ export class ItemCuenta {
   }
 
   resValue(cantidad:number){
+    if (this.value < cantidad) {
+      throw new Error('No puedes retirar más de lo que tienes');
+    }
     this.value -= cantidad;
   }
 }

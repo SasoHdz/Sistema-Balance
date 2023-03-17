@@ -55,16 +55,52 @@
     </div>
   </div>
 </div>
+<h3>{{message}}</h3>
+<button type="button" (click)="addCuenta(codigo,nombre,montonew,tipo)" class="btn btn-primary">Crear Cuenta</button>
+<div class="container-move mt-2">
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">codigo</span>
+    <input type="text" [(ngModel)]="codigo" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+  </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">nombre cuenta</span>
+    <input type="text" [(ngModel)]="nombre" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+  </div>
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1">monto</span>
+    <input type="number" [(ngModel)]="montonew" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+  </div>
+  <div class="input-group mb-3">
+    <select
+    class="form-control form-control-lg"
+    [(ngModel)]="tipo"
+    id="debe"
+  >
+    <option>
+      Activo
+    </option>
+    <option>
+      Pasivo
+    </option>
+    <option>
+      Capital
+    </option>
+  </select>
+  </div>
+</div>
 <div
   *ngIf="
-    tablesCuentas[0].getTotal() ===
-    tablesCuentas[1].getTotal() + tablesCuentas[2].getTotal();
+    activo ===
+    pasivo+capital;
     else badCount
   "
   class="alert alert-primary"
   role="alert"
 >
   La cuenta es correcta.
+</div>
+<div *ngIf="sameCount" class="alert alert-danger" role="alert">
+  Es la misma cuenta ....
 </div>
 <ng-template #badCount>
   <div class="alert alert-danger" role="alert">
@@ -98,8 +134,14 @@
     </div>
   </div>
   <div class="row">
-    <div *ngFor="let item of tablesCuentas" class="col">
-      {{ totalCuenta(item.cuentas) }}
+    <div class="col">
+      {{ activo }}
+    </div>
+    <div class="col">
+      {{ pasivo }}
+    </div>
+    <div class="col">
+      {{ capital }}
     </div>
   </div>
 </div>
