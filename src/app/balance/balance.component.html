@@ -1,4 +1,23 @@
-<div class="container-move mt-2">
+<div
+  *ngIf="activo === pasivo + capital; else badCount"
+  class="alert alert-primary"
+  role="alert"
+>
+  La cuenta es correcta.
+</div>
+<div *ngIf="sameCount" class="alert alert-danger" role="alert">
+  Es la misma cuenta ....
+</div>
+<ng-template #badCount>
+  <div class="alert alert-danger" role="alert">
+    La cuenta es incorrecta, quiza te falta hacer algun movimiento.
+  </div>
+</ng-template>
+<!--Doble Operacion-->
+<div class="container-move mt-2" [style.display] ="doble ? '': 'none'">
+  <div class="row">
+    <h4 class="text-danger">{{ message }}</h4>
+  </div>
   <div class="row">
     <div class="col">
       <div class="input-group mb-3">
@@ -43,7 +62,7 @@
     <div class="col">
       <div class="input-group mb-3">
         <span class="input-group-text">Monto:</span>
-        <input type="number" class="form-control" [(ngModel)]="monto" />
+        <input type="number" class="form-control" min="0" [(ngModel)]="monto" />
         <button
           type="button"
           class="btn btn-primary"
@@ -55,58 +74,88 @@
     </div>
   </div>
 </div>
-<h3>{{message}}</h3>
-<button type="button" (click)="addCuenta(codigo,nombre,montonew,tipo)" class="btn btn-primary">Crear Cuenta</button>
-<div class="container-move mt-2">
-  <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">codigo</span>
-    <input type="text" [(ngModel)]="codigo" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+<!--Simple operacion-->
+<div class="container-move mt-2" [style.display] ="doble ? 'none': ''">
+  <div class="row">
+    <h4 class="text-danger">{{ message }}</h4>
   </div>
-  <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">nombre cuenta</span>
-    <input type="text" [(ngModel)]="nombre" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
-  </div>
-  <div class="input-group mb-3">
-    <span class="input-group-text" id="basic-addon1">monto</span>
-    <input type="number" [(ngModel)]="montonew" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
-  </div>
-  <div class="input-group mb-3">
-    <select
-    class="form-control form-control-lg"
-    [(ngModel)]="tipo"
-    id="debe"
-  >
-    <option>
-      Activo
-    </option>
-    <option>
-      Pasivo
-    </option>
-    <option>
-      Capital
-    </option>
-  </select>
+  <div class="row">
+    <div class="col">
+      <div class="input-group mb-3">
+        <span class="input-group-text">Operación:</span>
+        <select
+          class="form-control form-control-lg"
+          [(ngModel)]="operacion"
+          id="debe"
+        >
+          <option >
+            Debe
+          </option>
+          <option >
+            Haber
+          </option>
+
+        </select>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group mb-3">
+        <span class="input-group-text">Cuenta:</span>
+        <select
+          class="form-control form-control-lg"
+          [(ngModel)]="cuenta"
+          id="debe"
+        >
+          <option *ngFor="let item of tablesCuentas[0].cuentas">
+            {{ item.nameCount }}
+          </option>
+          <option *ngFor="let item of tablesCuentas[1].cuentas">
+            {{ item.nameCount }}
+          </option>
+          <option *ngFor="let item of tablesCuentas[2].cuentas">
+            {{ item.nameCount }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group mb-3">
+        <span class="input-group-text">Monto:</span>
+        <input type="number" min="0" class="form-control" [(ngModel)]="monto" />
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="modificarCuentaSimple(cuenta,monto)"
+        >
+          Listo!!
+        </button>
+      </div>
+    </div>
   </div>
 </div>
-<div
-  *ngIf="
-    activo ===
-    pasivo+capital;
-    else badCount
-  "
-  class="alert alert-primary"
-  role="alert"
->
-  La cuenta es correcta.
-</div>
-<div *ngIf="sameCount" class="alert alert-danger" role="alert">
-  Es la misma cuenta ....
-</div>
-<ng-template #badCount>
-  <div class="alert alert-danger" role="alert">
-    La cuenta es incorrecta, quiza te falta hacer algun movimiento.
+
+<div class="container-move text-center mt-2">
+  <div class="row">
+    <div class="col">
+      <!-- Button trigger modal create count -->
+      <button
+        type="button"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#exampleModal"
+      >
+        Crear cuenta
+      </button>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalDelete">Eliminar una cuenta</button>
+    </div>
+    <div class="col">
+      <button type="button" class="btn btn-secondary" (click)="hidde()" [style.display] ="doble ? '': 'none'">Movimiento Simple</button>
+      <button type="button" class="btn btn-secondary" (click)="hidde()" [style.display] ="doble ? 'none': ''">Movimiento Doble</button>
+    </div>
   </div>
-</ng-template>
+</div>
 <div class="container text-center">
   <div class="row">
     <div *ngFor="let item of tablesCuentas" class="col">
@@ -145,4 +194,122 @@
     </div>
   </div>
 </div>
+<!-- Modal Crear -->
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar Cuenta</h1>
+        <h4>{{message}}</h4>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">codigo</span>
+          <input
+            type="text"
+            [(ngModel)]="codigo"
+            class="form-control"
+            placeholder="Ejemplo: 2100"
+            aria-label="codigo"
+            aria-describedby="basic-addon1"
+            required
+          />
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">nombre cuenta</span>
+          <input
+            type="text"
+            [(ngModel)]="nombre"
+            class="form-control"
+            placeholder="Ejemplo: Rentas"
+            aria-label="nombre cuenta"
+            aria-describedby="basic-addon1"
+          />
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">monto</span>
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="montonew"
+            class="form-control"
+            aria-label="monto"
+            aria-describedby="basic-addon1"
+          />
+        </div>
+        <div class="input-group mb-3">
+          <select
+            class="form-control form-control-lg"
+            [(ngModel)]="tipo"
+            id="debe"
+          >
+            <option>Activo</option>
+            <option>Pasivo</option>
+            <option>Capital</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cerrar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="addCuenta(codigo, nombre, montonew, tipo)"
+          data-bs-dismiss="modal"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- Modal Eliminar -->
+<div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalDeleteLabel">Eliminar Cuenta</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <span class="input-group-text">Cuentas:</span>
+          <select
+            class="form-control form-control-lg"
+            [(ngModel)]="deletedCuenta"
+            id="deletedCuenta"
+          >
+            <option *ngFor="let item of tablesCuentas[0].cuentas">
+              {{ item.nameCount }}
+            </option>
+            <option *ngFor="let item of tablesCuentas[1].cuentas">
+              {{ item.nameCount }}
+            </option>
+            <option *ngFor="let item of tablesCuentas[2].cuentas">
+              {{ item.nameCount }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="deleCuenta(deletedCuenta)">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>

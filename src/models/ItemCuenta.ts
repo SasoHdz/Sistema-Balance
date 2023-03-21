@@ -11,6 +11,30 @@ export class ItemCuenta {
     this.itemTipo = itemTipo
   }
 
+  setCode(newCode:string){
+    this.code = newCode;
+  }
+
+  getCode(){
+    return this.code;
+  }
+
+  setNameCount(newNameC:string){
+    this.nameCount = newNameC;
+  }
+
+  getNameCount(){
+    return this.nameCount;
+  }
+
+  setValue(n:number){
+    this.value = n;
+  }
+
+  getValue(){
+    return this.value;
+  }
+
   addValue(cantidad:number){
     this.value += cantidad;
   }

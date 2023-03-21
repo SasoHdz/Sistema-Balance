@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { Cuenta } from 'src/models/cuenta';
 import { ItemCuenta } from 'src/models/ItemCuenta';
@@ -9,21 +9,33 @@ import { ItemCuenta } from 'src/models/ItemCuenta';
   styleUrls: ['./balance.component.scss'],
 })
 export class BalanceComponent {
+  keyStorage = 'balance'; //Key localStorage
+  message: string = ''; //Mensaje Error
+  deletedCuenta: string = ''; //Cuenta a eliminar
+  doble: boolean = false; //Toggle Forms
+
+  /*Form doble operacion*/
   debe: string = '';
   haber: string = '';
   tdebe: string = '';
   thaber: string = '';
   monto: number = 0;
-  keyStorage = 'balance';
+  sameCount = false;
+
+  /*Total de subcuentas*/
   activo = 0;
   pasivo = 0;
   capital = 0;
-  sameCount = false;
-  message :string = '';
-  codigo:string = '';
+
+  /*Nueva Cuenta*/
+  codigo: string = '';
   nombre: string = '';
   tipo: string = '';
   montonew: number = 0;
+
+  /*Form movimiento simple*/
+  operacion: string = '';
+  cuenta: string = '';
 
   tablesCuentasInfo: Cuenta[] = [
     new Cuenta('Activo', [
@@ -199,7 +211,6 @@ export class BalanceComponent {
   }
 
   movimiento(nombreC: string, monto: number, op: number) {
-
     let indice = this.tablesCuentas[0].cuentas.findIndex(
       (c) => c.nameCount === nombreC
     );
@@ -207,20 +218,19 @@ export class BalanceComponent {
     if (indice >= 0) {
       //console.log(indice + "If 1");
       //debugger
-      op === 1
-      if(op===1){
-        this.tablesCuentas[0].cuentas[indice].addValue(monto)
-      }
-      else {
+      op === 1;
+      if (op === 1) {
+        this.tablesCuentas[0].cuentas[indice].addValue(monto);
+      } else {
         try {
-         this.tablesCuentas[0].cuentas[indice].resValue(monto);
+          this.tablesCuentas[0].cuentas[indice].resValue(monto);
         } catch (error) {
-          this.message="Error no puedes sacar mas de lo que tienes";
+          this.message = 'Error no puedes sacar mas de lo que tienes';
           console.log(error);
         }
       }
 
-        console.log(this.tablesCuentas[0].cuentas[indice]);
+      console.log(this.tablesCuentas[0].cuentas[indice]);
 
       //debugger
     } else {
@@ -229,39 +239,36 @@ export class BalanceComponent {
       );
       if (indice >= 0) {
         //console.log(indice + "If 2");
-        op === 1
-      if(op===1){
-        this.tablesCuentas[1].cuentas[indice].addValue(monto)
-      }
-      else {
-        try {
-         this.tablesCuentas[1].cuentas[indice].resValue(monto);
-        } catch (error) {
-          this.message="Error no puedes sacar mas de lo que tienes";
-          console.log(error);
+        op === 1;
+        if (op === 1) {
+          this.tablesCuentas[1].cuentas[indice].addValue(monto);
+        } else {
+          try {
+            this.tablesCuentas[1].cuentas[indice].resValue(monto);
+          } catch (error) {
+            this.message = 'Error no puedes sacar mas de lo que tienes';
+            console.log(error);
+          }
         }
-      }
 
-          console.log(this.tablesCuentas[1].cuentas[indice]);
+        console.log(this.tablesCuentas[1].cuentas[indice]);
       } else {
         indice = this.tablesCuentas[2].cuentas.findIndex(
           (c) => c.nameCount === nombreC
         );
         //console.log(indice + "Else final");
-        op === 1
-      if(op===1){
-        this.tablesCuentas[2].cuentas[indice].addValue(monto)
-      }
-      else {
-        try {
-         this.tablesCuentas[2].cuentas[indice].resValue(monto);
-        } catch (error) {
-          this.message="Error no puedes sacar mas de lo que tienes";
-          console.log(error);
+        op === 1;
+        if (op === 1) {
+          this.tablesCuentas[2].cuentas[indice].addValue(monto);
+        } else {
+          try {
+            this.tablesCuentas[2].cuentas[indice].resValue(monto);
+          } catch (error) {
+            this.message = 'Error no puedes sacar mas de lo que tienes';
+            console.log(error);
+          }
         }
-      }
-          console.log(this.tablesCuentas[2].cuentas[indice]);
-
+        console.log(this.tablesCuentas[2].cuentas[indice]);
       }
     }
     this.totalCuenta();
@@ -275,15 +282,15 @@ export class BalanceComponent {
   modificarCuenta(debe: string, haber: string, monto: number) {
     //Debe se sumara la cantidad de haber
     //Verifica que la cantidad haber, es valida
-    if(debe===haber){
-      this.sameCount=true;
-    }
-    else {
-      this.sameCount=false;
-      debugger
+    this.message = '';
+    if (debe === haber) {
+      this.sameCount = true;
+    } else {
+      this.sameCount = false;
+      //debugger
       this.isActive(debe)
-      ? this.movimiento(debe, monto, 1)
-      : this.movimiento(debe, monto, 0);
+        ? this.movimiento(debe, monto, 1)
+        : this.movimiento(debe, monto, 0);
 
       this.isActive(haber)
         ? this.movimiento(haber, monto, 0)
@@ -292,18 +299,78 @@ export class BalanceComponent {
       localStorage.setItem(this.keyStorage, JSON.stringify(this.tablesCuentas));
     }
 
+    this.monto = 0;
+  }
+
+  modificarCuentaSimple(cuenta: string, monto: number) {
+    this.message = '';
+    this.isActive(cuenta)
+      ? this.movimiento(cuenta, monto, 1)
+      : this.movimiento(cuenta, monto, 0);
+    localStorage.setItem(this.keyStorage, JSON.stringify(this.tablesCuentas));
+
+    this.monto = 0;
   }
 
   mostrar() {
     console.log(this.tablesCuentas);
   }
 
-  addCuenta(code:string, nombre:string, monto:number,tipo:string){
-    const c = new ItemCuenta(code,nombre,monto,'C');
-    this.tablesCuentas.map(e=>{
-      if(e.tipo === tipo) e.cuentas.push(c);
-    });
+  addCuenta(code: string, nombre: string, monto: number, tipo: string) {
+    this.message = '';
+    if (!this.existCount(nombre, code)) {
+      const c = new ItemCuenta(code, nombre, monto, 'C');
+      this.tablesCuentas.map((e) => {
+        if (e.tipo === tipo) e.cuentas.push(c);
+      });
+      localStorage.setItem(this.keyStorage, JSON.stringify(this.tablesCuentas));
+      this.totalCuenta();
+    } else {
+      this.message = 'La cuenta o codigo ya existe!!';
+    }
 
-    this.totalCuenta()
+    this.codigo = '';
+    this.nombre = '';
+    this.montonew = 0;
+    this.tipo = '';
+  }
+
+  deleCuenta(name: string) {
+    this.message = '';
+    let deleteResponse = this.tablesCuentas[0].deleteSubElement(name);
+    if (!deleteResponse) {
+      deleteResponse = this.tablesCuentas[1].deleteSubElement(name);
+      if (!deleteResponse) {
+        deleteResponse = this.tablesCuentas[2].deleteSubElement(name);
+      }
+    }
+  }
+
+  hidde() {
+    this.doble = !this.doble;
+  }
+
+  existCount(name: string, codigo: string): boolean {
+    let exist = this.tablesCuentas[0].cuentas.some((c) => c.nameCount === name);
+    if (!exist) {
+      exist = this.tablesCuentas[1].cuentas.some((c) => c.nameCount === name);
+      if (!exist) {
+        exist = this.tablesCuentas[2].cuentas.some((c) => c.nameCount === name);
+      }
+    }
+
+    let existC = this.tablesCuentas[0].cuentas.some((c) => c.code === codigo);
+    if (!existC) {
+      existC = this.tablesCuentas[1].cuentas.some(
+        (c) => c.nameCount === codigo
+      );
+      if (!existC) {
+        existC = this.tablesCuentas[2].cuentas.some(
+          (c) => c.nameCount === codigo
+        );
+      }
+    }
+
+    return exist || existC;
   }
 }
